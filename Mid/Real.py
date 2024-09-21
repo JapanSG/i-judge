@@ -1,9 +1,7 @@
 '''Real'''
 def is_on(string : str):
     '''Return True if string == "on" else return False'''
-    if string == "on":
-        return True
-    return False
+    return bool(string == 'on')
 def get_val(a,b,c,d,e,f,g,dp)->str:
     '''Get val'''
     ans = ""
