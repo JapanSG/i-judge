@@ -48,6 +48,7 @@ def to_notation(num:String)->str:
     if num.string[0] == "-":
         num.replace("-","")
         neg = "-"
+    
     num.insert(".",1)
     power = len(num.string[2:])
     zero_index = len(num)-1
@@ -60,7 +61,7 @@ def to_notation(num:String)->str:
     return f"{neg}{num} x 10^{power}"
 def main():
     '''Driver Code'''
-    num = String("4590.000")
+    num = String("123000000")
     print(to_notation(num))
 if __name__ == "__main__":
     main()
