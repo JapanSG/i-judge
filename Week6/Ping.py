@@ -27,9 +27,9 @@ def main():
     input()
     line = input()
     ip = get_ip(line)
-    least = 10000
+    least = 10000000
     most = -1
-    total,received = 0
+    total,received = 0,0
     for _ in range(4):
         line = input()
         j = line.find("time")+4
