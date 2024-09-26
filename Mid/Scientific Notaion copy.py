@@ -11,16 +11,13 @@ class String(str):
     def insert(self,sub_str:str,index:int) -> None:
         '''Adds substring at index'''
         self.string = self.string[:index]+sub_str+self.string[index:]
-    def append(self,sub_str:str) -> None:
-        '''Append substring'''
-        self.string = self.string+sub_str
     def isalzero(self) -> bool:
         '''Check if string is all 0'''
         for i in self.string:
-            if i != 0:
+            if i not in ["0","."]:
                 return False
         return True
-    def replace(self,old:str,new:str) -> None:
+    def replace_(self,old:str,new:str) -> None:
         '''Replace all old substring with new substring'''
         old_len = len(old)
         new_len = len(new)
@@ -40,15 +37,35 @@ class String(str):
     def length(self)->int:
         '''Return string length'''
         length = 0
-        for i in self.string:
+        for _ in self.string:
             length += 1
         return length
 def to_notation(num:String)->str:
+    '''to notation'''
+    if num.isalzero():
+        return 0
     neg = ""
     if num.string[0] == "-":
-        num.replace("-","")
+        num.replace_("-","")
         neg = "-"
-    
+    if "." in num:
+        if num.string[0] == "0":
+            new = String(num.string[2:])
+            power = 1
+            for i in new.string:
+                if i != "0":
+                    break
+                power += 1
+            new = String(new.string[power-1:])
+            new.insert(".",1)
+            if new.length() == 2:
+                new.string = new.string[0]
+            return f"{neg}{new} x 10^-{power}"
+        point = num.string.find(".")
+        power = String(num.string[:point]).length()-1
+        new = String(num.string[:point]+num.string[point+1:])
+        new.insert(".",1)
+        return f"{neg}{new} x 10^{power}"
     num.insert(".",1)
     power = len(num.string[2:])
     zero_index = len(num)-1
@@ -58,10 +75,65 @@ def to_notation(num:String)->str:
             break
         zero_index -= 1
     num.delete(zero_index+1,num.length()-1)
+    if num.length() == 2:
+        num.string = num.string[0]
     return f"{neg}{num} x 10^{power}"
+
+def to_num(notation : str)->float:
+    '''Return num'''
+    neg = ""
+    if notation[0] == "-":
+        notation = notation[1:]
+        neg = "-"
+    if "." in notation and notation[0] == "0":
+        power = int(notation[notation.find("^")+1:])
+        right = String(notation[2:notation.find(" ")])
+        if power < 0:
+            new = notation[:notation.find('.')]+notation[notation.find('.')+1:notation.find(' ')]
+            new = f"{'0'*abs(power)}"
+            new = String(new)
+            new.insert(".",1)
+            return f"{neg}{new}"
+        if right.length() <= power:
+            right.string = f"{right.string}{'0'*(power-right.length())}"
+        else:
+            right.insert(".", power)
+        for i in range(right.length()):
+            if right.string[i] != "0":
+                zero_index = i
+                break
+        right.delete(0,zero_index-1)
+        if right.string[0] == ".":
+            right.insert("0",0)
+        return f"{neg}{right}"
+    if "." in notation:
+        left = notation[:notation.find(".")]
+        right = notation[notation.find(".")+1:notation.find(" ")]
+        power = int(notation[notation.find("^")+1:])
+        places = len(right)
+        if power < 0:
+            ans = f"{'0'*(abs(power))}{left}{right}"
+            ans = f"{neg}{ans[0]}.{ans[1:]}"
+            return ans
+        if power - places < 0:
+            a = f"{left}{right}"
+            a = String(a)
+            a.insert(".",power+1)
+            return f"{neg}{a.string}"
+        return f"{neg}{left}{right}{'0'*(power-places)}"
+    power = int(notation[notation.find("^")+1:])
+    if power < 0:
+        new = '0'*(abs(power)-len(notation[:notation.find(' ')])+1)+notation[:notation.find(' ')]
+        new = String(new)
+        new.insert(".",1)
+        return f"{neg}{new}"
+    return f"{neg}{notation[0:notation.find(' ')]}{'0'*power}"
 def main():
     '''Driver Code'''
-    num = String("123000000")
-    print(to_notation(num))
+    num = String(input())
+    if "x" in num.string:
+        print(to_num(num.string))
+    else:
+        print(to_notation(num))
 if __name__ == "__main__":
     main()
